@@ -36,7 +36,7 @@ export function levelTraversal<T>(
   root: T,
   params: {
     getChildren: ChildrenGetter<T>;
-    onTraverse?: (node: T, index: number, level: number) => boolean;
+    onTraverse?: (node: T, index: number, level: number) => void | boolean;
     /*
      * 换行回调
      *
