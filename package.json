@@ -1,12 +1,12 @@
 {
-  "name": "@reuseable.js/tree",
+  "name": "@reuse-it/tree",
   "author": "Mark Li",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "git@github.com:lmarklil/shared-state.git"
+    "url": "git@github.com:lmarklil/tree.git"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "shared-state"
   ],
