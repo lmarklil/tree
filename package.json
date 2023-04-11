@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git@github.com:lmarklil/tree.git"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [
     "shared-state"
   ],
