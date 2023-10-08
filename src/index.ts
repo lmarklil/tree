@@ -7,7 +7,7 @@ export function preorderTraversal<T>(
   root: T,
   params: {
     getChildren: ChildrenGetter<T>;
-    onTraverse?: (node: T) => void | boolean;
+    onTraverse: (node: T) => void;
   }
 ) {
   const { getChildren, onTraverse } = params;
@@ -20,9 +20,7 @@ export function preorderTraversal<T>(
     if (node) {
       const children = getChildren(node);
 
-      const shouldReturn = onTraverse?.(node);
-
-      if (shouldReturn) return;
+      onTraverse(node);
 
       children && stack.push(...[...children].reverse()); // Array.reverse 会修改源数组，需要克隆后再reverse
     }
@@ -36,7 +34,7 @@ export function levelTraversal<T>(
   root: T,
   params: {
     getChildren: ChildrenGetter<T>;
-    onTraverse?: (node: T, index: number, level: number) => void | boolean;
+    onTraverse?: (node: T, index: number, level: number) => void;
     /*
      * 换行回调
      *
@@ -64,9 +62,7 @@ export function levelTraversal<T>(
     const node = queue.shift();
 
     if (node) {
-      const shouldReturn = onTraverse?.(node, index++, level);
-
-      if (shouldReturn) return;
+      onTraverse?.(node, index++, level);
 
       const children = getChildren(node);
 
@@ -171,9 +167,9 @@ export function explorPath<T>(
   params: {
     getChildren: ChildrenGetter<T>;
     /*
-     * 每次路径更新时触发，函数返回true时终止探索
+     * 每次路径更新时触发
      */
-    onProgress: (path: T[]) => void | boolean;
+    onProgress: (path: T[]) => void;
   }
 ) {
   const { getChildren, onProgress } = params;
@@ -189,9 +185,7 @@ export function explorPath<T>(
 
       const children = getChildren(node);
 
-      const shouldReturn = onProgress(path);
-
-      if (shouldReturn) return true;
+      onProgress(path);
 
       if (children && children.length > 0) {
         for (let i = children.length - 1; i > -1; i--) {
