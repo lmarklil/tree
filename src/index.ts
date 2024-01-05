@@ -1,13 +1,14 @@
 export type ChildrenGetter<T> = (node: T) => T[] | null | undefined;
 
-/*
- * 先序遍历
- */
+export type IteratorResult = void | typeof Break;
+
+export const Break = Symbol();
+
 export function preorderTraversal<T>(
   root: T,
   params: {
     getChildren: ChildrenGetter<T>;
-    onTraverse: (node: T) => void;
+    onTraverse: (node: T) => IteratorResult;
   }
 ) {
   const { getChildren, onTraverse } = params;
@@ -20,28 +21,21 @@ export function preorderTraversal<T>(
     if (node) {
       const children = getChildren(node);
 
-      onTraverse(node);
+      const iteratorResult = onTraverse(node);
+
+      if (iteratorResult === Break) return;
 
       children && stack.push(...[...children].reverse()); // Array.reverse 会修改源数组，需要克隆后再reverse
     }
   }
 }
 
-/*
- * 层次遍历
- */
 export function levelTraversal<T>(
   root: T,
   params: {
     getChildren: ChildrenGetter<T>;
-    onTraverse?: (node: T, index: number, level: number) => void;
-    /*
-     * 换行回调
-     *
-     * nodes: 当前层次节点
-     * level: 当前层次
-     */
-    onWrap?: (nodes: T[], level: number) => void;
+    onTraverse?: (node: T, index: number, level: number) => IteratorResult;
+    onWrap?: (nodes: T[], level: number) => IteratorResult;
   }
 ) {
   const { getChildren, onTraverse, onWrap } = params;
@@ -56,13 +50,18 @@ export function levelTraversal<T>(
     if (nextLevelNodeCount === queue.length) {
       level++;
       nextLevelNodeCount = 0; // 重置下一层节点数
-      onWrap?.([...queue], level);
+
+      const iteratorResult = onWrap?.([...queue], level);
+
+      if (iteratorResult === Break) return;
     }
 
     const node = queue.shift();
 
     if (node) {
-      onTraverse?.(node, index++, level);
+      const iteratorResult = onTraverse?.(node, index++, level);
+
+      if (iteratorResult === Break) return;
 
       const children = getChildren(node);
 
@@ -73,9 +72,6 @@ export function levelTraversal<T>(
   }
 }
 
-/*
- * 获取叶子节点
- */
 export function getLeafNodes<T>(
   root: T,
   params: { getChildren: ChildrenGetter<T> }
@@ -96,9 +92,6 @@ export function getLeafNodes<T>(
   return leafNodes;
 }
 
-/*
- * 计算高度
- */
 export function computeHeight<T>(
   root: T,
   params: { getChildren: ChildrenGetter<T> }
@@ -109,15 +102,14 @@ export function computeHeight<T>(
 
   levelTraversal(root, {
     getChildren,
-    onWrap: (nodes, level) => (height = level),
+    onWrap: (nodes, level) => {
+      height = level;
+    },
   });
 
   return height;
 }
 
-/*
- * 计算度
- */
 export function computeDegree<T>(
   root: T,
   params: { getChildren: ChildrenGetter<T> }
@@ -136,9 +128,6 @@ export function computeDegree<T>(
   return degree;
 }
 
-/*
- * 获取后代节点
- */
 export function getDescendantNodes<T>(
   root: T,
   params: { getChildren: ChildrenGetter<T> }
@@ -157,19 +146,11 @@ export function getDescendantNodes<T>(
   return descendantNodes;
 }
 
-/*
- * 探索路径
- *
- * @description 基于先序遍历探索路径
- */
 export function explorPath<T>(
   root: T,
   params: {
     getChildren: ChildrenGetter<T>;
-    /*
-     * 每次路径更新时触发
-     */
-    onProgress: (path: T[]) => void;
+    onProgress: (path: T[]) => IteratorResult;
   }
 ) {
   const { getChildren, onProgress } = params;
@@ -185,7 +166,9 @@ export function explorPath<T>(
 
       const children = getChildren(node);
 
-      onProgress(path);
+      const iteratorResult = onProgress(path);
+
+      if (iteratorResult === Break) return Break;
 
       if (children && children.length > 0) {
         for (let i = children.length - 1; i > -1; i--) {
