@@ -6,9 +6,9 @@
     "type": "git",
     "url": "git@github.com:lmarklil/tree.git"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "keywords": [
-    "shared-state"
+    "tree"
   ],
   "description": "",
   "scripts": {

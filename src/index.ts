@@ -25,7 +25,13 @@ export function preorderTraversal<T>(
 
       if (iteratorResult === Break) return;
 
-      children && stack.push(...[...children].reverse()); // Array.reverse 会修改源数组，需要克隆后再reverse
+      if (children) {
+        for (let i = children.length - 1; i > -1; i--) {
+          const child = children[i];
+
+          child && stack.push(child);
+        }
+      }
     }
   }
 }
